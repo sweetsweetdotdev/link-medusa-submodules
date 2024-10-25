@@ -1,0 +1,14 @@
+{
+  "name": "@sweetsweet/link-medusa-submodules",
+  "version": "1.0.0",
+  "description": "Automates symlinking of medusa submodules for workflows and other folders",
+  "main": "create-symlinks.js",
+  "bin": {
+    "link-medusa-submodules": "./create-symlinks.js"
+  },
+  "dependencies": {
+    "fs-extra": "^11.0.0"
+  },
+  "author": "Andreas Ekström <andreas@sweetsweet.dev>",
+  "license": "MIT"
+}
