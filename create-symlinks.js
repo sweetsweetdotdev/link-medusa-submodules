@@ -7,17 +7,22 @@ const path = require('path');
 const targetDirs = ['admin', 'api', 'jobs', 'links', 'modules', 'scripts', 'subscribers', 'workflows'];
 
 // Paths
-const packagesDir = path.join(__dirname, 'packages');
+const rootDir = process.cwd();
+const packagesDir = path.join(rootDir, 'packages');
+const srcDir = path.join(rootDir, 'src');
 
 // Function to create symlinks
 const createSymlinks = () => {
     fs.readdir(packagesDir, (err, packages) => {
-        if (err) throw err;
+        if (err) {
+            console.error(`Failed to read packages directory at ${packagesDir}`);
+            throw err;
+        }
 
         packages.forEach(pkg => {
             targetDirs.forEach(targetDir => {
                 const pkgTargetDir = path.join(packagesDir, pkg, targetDir);
-                const destTargetDir = path.join(__dirname, 'src', targetDir, pkg);
+                const destTargetDir = path.join(srcDir, targetDir, pkg);
 
                 // Check if the package has the target directory
                 if (fs.existsSync(pkgTargetDir)) {
@@ -26,7 +31,10 @@ const createSymlinks = () => {
 
                     // Get all files in the package's target directory
                     fs.readdir(pkgTargetDir, (err, files) => {
-                        if (err) throw err;
+                        if (err) {
+                            console.error(`Failed to read directory at ${pkgTargetDir}`);
+                            throw err;
+                        }
 
                         files.forEach(file => {
                             const srcFile = path.join(pkgTargetDir, file);
@@ -34,7 +42,10 @@ const createSymlinks = () => {
 
                             // Create symlink
                             fs.symlink(srcFile, destFile, 'file', err => {
-                                if (err && err.code !== 'EEXIST') throw err;
+                                if (err && err.code !== 'EEXIST') {
+                                    console.error(`Failed to create symlink from ${srcFile} to ${destFile}`);
+                                    throw err;
+                                }
                                 console.log(`Symlinked ${srcFile} to ${destFile}`);
                             });
                         });
@@ -44,5 +55,6 @@ const createSymlinks = () => {
         });
     });
 };
+
 
 createSymlinks();

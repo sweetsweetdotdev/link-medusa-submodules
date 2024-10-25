@@ -1,10 +1,11 @@
 {
   "name": "@sweetsweet/link-medusa-submodules",
-  "version": "1.0.0",
+  "private": false,
+  "version": "1.0.1",
   "description": "Automates symlinking of medusa submodules for workflows and other folders",
   "main": "create-symlinks.js",
   "bin": {
-    "link-medusa-submodules": "./create-symlinks.js"
+    "link-medusa-submodules": "create-symlinks.js"
   },
   "dependencies": {
     "fs-extra": "^11.0.0"
