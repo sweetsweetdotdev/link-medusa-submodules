@@ -15,8 +15,8 @@ const srcDir = path.join(rootDir, 'src');
 const createSymlinks = () => {
     fs.readdir(packagesDir, (err, packages) => {
         if (err) {
-            console.error(`Failed to read packages directory at ${packagesDir}`);
-            throw err;
+            console.warn(`Failed to read packages directory at ${packagesDir}`);
+            return;
         }
 
         packages.forEach(pkg => {
@@ -32,8 +32,8 @@ const createSymlinks = () => {
                     // Get all files in the package's target directory
                     fs.readdir(pkgTargetDir, (err, files) => {
                         if (err) {
-                            console.error(`Failed to read directory at ${pkgTargetDir}`);
-                            throw err;
+                            console.warn(`Failed to read directory at ${pkgTargetDir}`);
+                            return;
                         }
 
                         files.forEach(file => {
@@ -43,9 +43,10 @@ const createSymlinks = () => {
                             // Create symlink
                             fs.symlink(srcFile, destFile, 'file', err => {
                                 if (err && err.code !== 'EEXIST') {
-                                    console.error(`Failed to create symlink from ${srcFile} to ${destFile}`);
-                                    throw err;
+                                    console.warn(`Failed to create symlink from ${srcFile} to ${destFile}`);
+                                    return;
                                 }
+
                                 console.log(`Symlinked ${srcFile} to ${destFile}`);
                             });
                         });
