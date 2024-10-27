@@ -11,5 +11,10 @@
     "fs-extra": "^11.0.0"
   },
   "author": "Andreas Ekström <andreas@sweetsweet.dev>",
-  "license": "MIT"
+  "license": "MIT",
+  "files": [
+    "create-symlinks.js",
+    "package.json",
+    "README.md"
+  ]
 }
