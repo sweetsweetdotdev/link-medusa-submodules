@@ -22,7 +22,7 @@ const createSymlinks = () => {
         packages.forEach(pkg => {
             targetDirs.forEach(targetDir => {
                 const pkgTargetDir = path.join(packagesDir, pkg, targetDir);
-                const destTargetDir = path.join(srcDir, targetDir, pkg);
+                const destTargetDir = path.join(srcDir, targetDir);
 
                 // Check if the package has the target directory
                 if (fs.existsSync(pkgTargetDir)) {
