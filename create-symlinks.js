@@ -3,7 +3,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 
-// Array of directories to symlink files into
+// Array of directories to copy files into
 const targetDirs = ['admin', 'api', 'jobs', 'links', 'modules', 'scripts', 'subscribers', 'workflows'];
 
 // Paths
@@ -11,8 +11,8 @@ const rootDir = process.cwd();
 const packagesDir = path.join(rootDir, 'packages');
 const srcDir = path.join(rootDir, 'src');
 
-// Function to create symlinks
-const createSymlinks = () => {
+// Function to copy files
+const copyFiles = () => {
     fs.readdir(packagesDir, (err, packages) => {
         if (err) {
             console.warn(`Failed to read packages directory at ${packagesDir}`);
@@ -29,33 +29,44 @@ const createSymlinks = () => {
                     // Ensure the destination directory exists
                     fs.ensureDirSync(destTargetDir);
 
-                    // Get all files in the package's target directory
-                    fs.readdir(pkgTargetDir, (err, files) => {
-                        if (err) {
-                            console.warn(`Failed to read directory at ${pkgTargetDir}`);
-                            return;
-                        }
+                    // Recursively traverse directories and copy files
+                    const traverseAndCopy = (currentDir, relativePath = '') => {
+                        fs.readdir(currentDir, { withFileTypes: true }, (err, entries) => {
+                            if (err) {
+                                console.warn(`Failed to read directory at ${currentDir}`);
+                                return;
+                            }
 
-                        files.forEach(file => {
-                            const srcFile = path.join(pkgTargetDir, file);
-                            const destFile = path.join(destTargetDir, file);
+                            entries.forEach(entry => {
+                                const entryPath = path.join(currentDir, entry.name);
+                                const relativeEntryPath = path.join(relativePath, entry.name);
+                                const destPath = path.join(destTargetDir, relativeEntryPath);
 
-                            // Create symlink
-                            fs.symlink(srcFile, destFile, 'file', err => {
-                                if (err && err.code !== 'EEXIST') {
-                                    console.warn(`Failed to create symlink from ${srcFile} to ${destFile}`);
-                                    return;
+                                if (entry.isDirectory()) {
+                                    // Ensure the destination directory exists
+                                    fs.ensureDirSync(destPath);
+                                    // Recursively traverse the subdirectory
+                                    traverseAndCopy(entryPath, relativeEntryPath);
+                                } else if (entry.isFile()) {
+                                    // Copy file and overwrite if it exists
+                                    fs.copy(entryPath, destPath, { overwrite: true }, err => {
+                                        if (err) {
+                                            console.warn(`Failed to copy file from ${entryPath} to ${destPath}`);
+                                            return;
+                                        }
+
+                                        console.log(`Copied ${entryPath} to ${destPath}`);
+                                    });
                                 }
-
-                                console.log(`Symlinked ${srcFile} to ${destFile}`);
                             });
                         });
-                    });
+                    };
+
+                    traverseAndCopy(pkgTargetDir);
                 }
             });
         });
     });
 };
 
-
-createSymlinks();
+copyFiles();
