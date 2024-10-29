@@ -48,15 +48,19 @@ const copyFiles = () => {
                                     // Recursively traverse the subdirectory
                                     traverseAndCopy(entryPath, relativeEntryPath);
                                 } else if (entry.isFile()) {
-                                    // Copy file and overwrite if it exists
-                                    fs.copy(entryPath, destPath, { overwrite: true }, err => {
-                                        if (err) {
-                                            console.warn(`Failed to copy file from ${entryPath} to ${destPath}`);
-                                            return;
-                                        }
+                                    // Check file extension
+                                    const ext = path.extname(entry.name);
+                                    if (['.js', '.tsx', '.ts'].includes(ext)) {
+                                        // Copy file and overwrite if it exists
+                                        fs.copy(entryPath, destPath, { overwrite: true }, err => {
+                                            if (err) {
+                                                console.warn(`Failed to copy file from ${entryPath} to ${destPath}`);
+                                                return;
+                                            }
 
-                                        console.log(`Copied ${entryPath} to ${destPath}`);
-                                    });
+                                            console.log(`Copied ${entryPath} to ${destPath}`);
+                                        });
+                                    }
                                 }
                             });
                         });
